@@ -55,20 +55,20 @@ class BearingRangeFactor
   virtual ~BearingRangeFactor() {}
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override {
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<gtsam::NonlinearFactor>(
         gtsam::NonlinearFactor::shared_ptr(new This(*this)));
   }
 
   // Return measurement expression
-  Expression<T> expression(Key key1, Key key2) const override {
+  virtual Expression<T> expression(Key key1, Key key2) const {
     return Expression<T>(T::Measure, Expression<A1>(key1),
                          Expression<A2>(key2));
   }
 
   /// print
-  void print(const std::string& s = "",
-                     const KeyFormatter& kf = DefaultKeyFormatter) const override {
+  virtual void print(const std::string& s = "",
+                     const KeyFormatter& kf = DefaultKeyFormatter) const {
     std::cout << s << "BearingRangeFactor" << std::endl;
     Base::print(s, kf);
   }

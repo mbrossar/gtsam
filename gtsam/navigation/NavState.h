@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <gtsam/geometry/ExtendedPose3.h>
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/base/Vector.h>
 #include <gtsam/base/Manifold.h>
@@ -156,6 +157,11 @@ public:
 
   /// retract with optional derivatives
   NavState retract(const Vector9& v, //
+      OptionalJacobian<9, 9> H1 = boost::none, OptionalJacobian<9, 9> H2 =
+          boost::none) const;
+
+  /// original retract with optional derivatives
+  NavState boxplus(const Vector9& v, //
       OptionalJacobian<9, 9> H1 = boost::none, OptionalJacobian<9, 9> H2 =
           boost::none) const;
 

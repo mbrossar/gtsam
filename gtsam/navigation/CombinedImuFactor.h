@@ -24,6 +24,7 @@
 
 /* GTSAM includes */
 #include <gtsam/navigation/ManifoldPreintegration.h>
+#include <gtsam/navigation/LieGroupPreintegration.h>
 #include <gtsam/navigation/TangentPreintegration.h>
 #include <gtsam/nonlinear/NonlinearFactor.h>
 #include <gtsam/base/Matrix.h>
@@ -32,9 +33,9 @@
 namespace gtsam {
 
 #ifdef GTSAM_TANGENT_PREINTEGRATION
-typedef TangentPreintegration PreintegrationType;
+typedef LieGroupPreintegration PreintegrationType;
 #else
-typedef ManifoldPreintegration PreintegrationType;
+typedef LieGroupPreintegration PreintegrationType;
 #endif
 
 /*
@@ -87,8 +88,8 @@ struct GTSAM_EXPORT PreintegrationCombinedParams : PreintegrationParams {
     return boost::shared_ptr<PreintegrationCombinedParams>(new PreintegrationCombinedParams(Vector3(0, 0, -g)));
   }
 
-  void print(const std::string& s="") const override;
-  bool equals(const PreintegratedRotationParams& other, double tol) const override;
+  void print(const std::string& s="") const;
+  bool equals(const PreintegratedRotationParams& other, double tol) const;
 
   void setBiasAccCovariance(const Matrix3& cov) { biasAccCovariance=cov; }
   void setBiasOmegaCovariance(const Matrix3& cov) { biasOmegaCovariance=cov; }
@@ -305,7 +306,7 @@ public:
   virtual ~CombinedImuFactor() {}
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override;
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const;
 
   /** implement functions needed for Testable */
 
@@ -314,11 +315,11 @@ public:
   GTSAM_EXPORT friend std::ostream& operator<<(std::ostream& os,
                                                const CombinedImuFactor&);
   /// print
-  void print(const std::string& s, const KeyFormatter& keyFormatter =
-      DefaultKeyFormatter) const override;
+  virtual void print(const std::string& s, const KeyFormatter& keyFormatter =
+      DefaultKeyFormatter) const;
 
   /// equals
-  bool equals(const NonlinearFactor& expected, double tol = 1e-9) const override;
+  virtual bool equals(const NonlinearFactor& expected, double tol = 1e-9) const;
   /// @}
 
   /** Access the preintegrated measurements. */
@@ -336,7 +337,7 @@ public:
       boost::optional<Matrix&> H1 = boost::none, boost::optional<Matrix&> H2 =
           boost::none, boost::optional<Matrix&> H3 = boost::none,
       boost::optional<Matrix&> H4 = boost::none, boost::optional<Matrix&> H5 =
-          boost::none, boost::optional<Matrix&> H6 = boost::none) const override;
+          boost::none, boost::optional<Matrix&> H6 = boost::none) const;
 
 #ifdef GTSAM_ALLOW_DEPRECATED_SINCE_V4
   /// @deprecated typename

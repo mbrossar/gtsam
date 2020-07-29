@@ -25,10 +25,10 @@ public:
   QPSParserException() {
   }
 
-  virtual ~QPSParserException() noexcept {
+  virtual ~QPSParserException() throw () {
   }
 
-  const char *what() const noexcept override {
+  virtual const char *what() const throw () {
     if (description_.empty())
       description_ = "There is a problem parsing the QPS file.\n";
     return description_.c_str();

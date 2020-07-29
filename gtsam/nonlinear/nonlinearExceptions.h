@@ -35,11 +35,11 @@ namespace gtsam {
     KeyFormatter formatter_;
     mutable std::string what_;
   public:
-    MarginalizeNonleafException(Key key, KeyFormatter formatter = DefaultKeyFormatter) noexcept :
+    MarginalizeNonleafException(Key key, KeyFormatter formatter = DefaultKeyFormatter) throw() :
       key_(key), formatter_(formatter) {}
-    virtual ~MarginalizeNonleafException() noexcept {}
+    virtual ~MarginalizeNonleafException() throw() {}
     Key key() const { return key_; }
-    const char* what() const noexcept override {
+    virtual const char* what() const throw() {
       if(what_.empty())
         what_ =
 "\nRequested to marginalize out variable " + formatter_(key_) + ", but this variable\n\

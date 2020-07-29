@@ -73,16 +73,16 @@ public:
   virtual ~VelocityConstraint() {}
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override {
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<gtsam::NonlinearFactor>(
         gtsam::NonlinearFactor::shared_ptr(new VelocityConstraint(*this))); }
 
   /**
    * Calculates the error for trapezoidal model given
    */
-  gtsam::Vector evaluateError(const PoseRTV& x1, const PoseRTV& x2,
+  virtual gtsam::Vector evaluateError(const PoseRTV& x1, const PoseRTV& x2,
       boost::optional<gtsam::Matrix&> H1=boost::none,
-      boost::optional<gtsam::Matrix&> H2=boost::none) const override {
+      boost::optional<gtsam::Matrix&> H2=boost::none) const {
     if (H1) *H1 = gtsam::numericalDerivative21<gtsam::Vector,PoseRTV,PoseRTV>(
         boost::bind(VelocityConstraint::evaluateError_, _1, _2, dt_, integration_mode_), x1, x2, 1e-5);
     if (H2) *H2 = gtsam::numericalDerivative22<gtsam::Vector,PoseRTV,PoseRTV>(
@@ -90,7 +90,7 @@ public:
     return evaluateError_(x1, x2, dt_, integration_mode_);
   }
 
-  void print(const std::string& s = "", const gtsam::KeyFormatter& formatter = gtsam::DefaultKeyFormatter) const override {
+  virtual void print(const std::string& s = "", const gtsam::KeyFormatter& formatter = gtsam::DefaultKeyFormatter) const {
     std::string a = "VelocityConstraint: " + s;
     Base::print(a, formatter);
     switch(integration_mode_) {

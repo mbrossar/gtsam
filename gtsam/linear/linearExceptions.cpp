@@ -24,7 +24,7 @@
 namespace gtsam {
 
   /* ************************************************************************* */
-  const char* IndeterminantLinearSystemException::what() const noexcept
+  const char* IndeterminantLinearSystemException::what() const throw()
   {
     if(!description_) {
       description_ = String(
@@ -43,7 +43,7 @@ more information.");
   }
 
   /* ************************************************************************* */
-  const char* InvalidNoiseModel::what() const noexcept {
+  const char* InvalidNoiseModel::what() const throw() {
     if(description_.empty())
       description_ = (boost::format(
       "A JacobianFactor was attempted to be constructed or modified to use a\n"
@@ -54,7 +54,7 @@ more information.");
   }
 
   /* ************************************************************************* */
-  const char* InvalidMatrixBlock::what() const noexcept {
+  const char* InvalidMatrixBlock::what() const throw() {
     if(description_.empty())
       description_ = (boost::format(
       "A JacobianFactor was attempted to be constructed with a matrix block of\n"

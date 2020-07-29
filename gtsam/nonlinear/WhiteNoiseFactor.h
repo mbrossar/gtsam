@@ -109,7 +109,7 @@ namespace gtsam {
 
     /// Print
     void print(const std::string& p = "WhiteNoiseFactor",
-        const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+        const KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
       Base::print(p, keyFormatter);
       std::cout << p + ".z: " << z_ << std::endl;
     }
@@ -119,12 +119,12 @@ namespace gtsam {
     /// @{
 
     /// get the dimension of the factor (number of rows on linearization)
-    size_t dim() const override {
+    virtual size_t dim() const {
       return 2;
     }
 
     /// Calculate the error of the factor, typically equal to log-likelihood
-    double error(const Values& x) const override {
+    inline double error(const Values& x) const {
       return f(z_, x.at<double>(meanKey_), x.at<double>(precisionKey_));
     }
 
@@ -153,7 +153,7 @@ namespace gtsam {
     /// @{
 
     /// linearize returns a Hessianfactor that is an approximation of error(p)
-    boost::shared_ptr<GaussianFactor> linearize(const Values& x) const override {
+    virtual boost::shared_ptr<GaussianFactor> linearize(const Values& x) const {
       double u = x.at<double>(meanKey_);
       double p = x.at<double>(precisionKey_);
       Key j1 = meanKey_;
@@ -163,7 +163,7 @@ namespace gtsam {
 
     // TODO: Frank commented this out for now, can it go?
     //    /// @return a deep copy of this factor
-    //    gtsam::NonlinearFactor::shared_ptr clone() const override {
+    //    virtual gtsam::NonlinearFactor::shared_ptr clone() const {
     //      return boost::static_pointer_cast<gtsam::NonlinearFactor>(
     //          gtsam::NonlinearFactor::shared_ptr(new This(*this))); }
 

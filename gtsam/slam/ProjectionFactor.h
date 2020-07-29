@@ -100,7 +100,7 @@ namespace gtsam {
     virtual ~GenericProjectionFactor() {}
 
     /// @return a deep copy of this factor
-    gtsam::NonlinearFactor::shared_ptr clone() const override {
+    virtual gtsam::NonlinearFactor::shared_ptr clone() const {
       return boost::static_pointer_cast<gtsam::NonlinearFactor>(
           gtsam::NonlinearFactor::shared_ptr(new This(*this))); }
 
@@ -109,7 +109,7 @@ namespace gtsam {
      * @param s optional string naming the factor
      * @param keyFormatter optional formatter useful for printing Symbols
      */
-    void print(const std::string& s = "", const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+    void print(const std::string& s = "", const KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
       std::cout << s << "GenericProjectionFactor, z = ";
       traits<Point2>::Print(measured_);
       if(this->body_P_sensor_)
@@ -118,7 +118,7 @@ namespace gtsam {
     }
 
     /// equals
-    bool equals(const NonlinearFactor& p, double tol = 1e-9) const override {
+    virtual bool equals(const NonlinearFactor& p, double tol = 1e-9) const {
       const This *e = dynamic_cast<const This*>(&p);
       return e
           && Base::equals(p, tol)
@@ -129,7 +129,7 @@ namespace gtsam {
 
     /// Evaluate error h(x)-z and optionally derivatives
     Vector evaluateError(const Pose3& pose, const Point3& point,
-        boost::optional<Matrix&> H1 = boost::none, boost::optional<Matrix&> H2 = boost::none) const override {
+        boost::optional<Matrix&> H1 = boost::none, boost::optional<Matrix&> H2 = boost::none) const {
       try {
         if(body_P_sensor_) {
           if(H1) {

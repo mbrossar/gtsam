@@ -109,8 +109,8 @@ private:
 public:
 
   /** y += alpha * A'*A*x */
-  void multiplyHessianAdd(double alpha, const VectorValues& x,
-      VectorValues& y) const override {
+  virtual void multiplyHessianAdd(double alpha, const VectorValues& x,
+      VectorValues& y) const {
     HessianFactor::multiplyHessianAdd(alpha, x, y);
   }
 
@@ -182,7 +182,7 @@ public:
   }
 
   /** Return the diagonal of the Hessian for this factor (raw memory version) */
-  void hessianDiagonal(double* d) const override {
+  virtual void hessianDiagonal(double* d) const {
 
     // Loop over all variables in the factor
     for (DenseIndex pos = 0; pos < (DenseIndex) size(); ++pos) {
@@ -193,7 +193,7 @@ public:
   }
 
   /// Add gradient at zero to d TODO: is it really the goal to add ??
-  void gradientAtZero(double* d) const override {
+  virtual void gradientAtZero(double* d) const {
 
     // Loop over all variables in the factor
     for (DenseIndex pos = 0; pos < (DenseIndex) size(); ++pos) {

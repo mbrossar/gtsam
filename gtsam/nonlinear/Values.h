@@ -149,13 +149,6 @@ namespace gtsam {
 
     /** Move constructor */
     Values(Values&& other);
-    
-    /** Constructor from initializer list. Example usage:
-     * \code
-     * Values v = {{k1, genericValue(pose1)}, {k2, genericValue(point2)}};
-     * \endcode
-     */
-    Values(std::initializer_list<ConstKeyValuePair> init);
 
     /** Construct from a Values and an update vector: identical to other.retract(delta) */
     Values(const Values& other, const VectorValues& delta);
@@ -439,16 +432,16 @@ namespace gtsam {
 
   public:
     /// Construct with the key-value pair attempted to be added
-    ValuesKeyAlreadyExists(Key key) noexcept :
+    ValuesKeyAlreadyExists(Key key) throw() :
       key_(key) {}
 
-    virtual ~ValuesKeyAlreadyExists() noexcept {}
+    virtual ~ValuesKeyAlreadyExists() throw() {}
 
     /// The duplicate key that was attempted to be added
-    Key key() const noexcept { return key_; }
+    Key key() const throw() { return key_; }
 
     /// The message to be displayed to the user
-    GTSAM_EXPORT const char* what() const noexcept override;
+    GTSAM_EXPORT virtual const char* what() const throw();
   };
 
   /* ************************************************************************* */
@@ -462,16 +455,16 @@ namespace gtsam {
 
   public:
     /// Construct with the key that does not exist in the values
-    ValuesKeyDoesNotExist(const char* operation, Key key) noexcept :
+    ValuesKeyDoesNotExist(const char* operation, Key key) throw() :
       operation_(operation), key_(key) {}
 
-    virtual ~ValuesKeyDoesNotExist() noexcept {}
+    virtual ~ValuesKeyDoesNotExist() throw() {}
 
     /// The key that was attempted to be accessed that does not exist
-    Key key() const noexcept { return key_; }
+    Key key() const throw() { return key_; }
 
     /// The message to be displayed to the user
-    GTSAM_EXPORT const char* what() const noexcept override;
+    GTSAM_EXPORT virtual const char* what() const throw();
   };
 
   /* ************************************************************************* */
@@ -487,13 +480,13 @@ namespace gtsam {
   public:
     /// Construct with the key that does not exist in the values
     ValuesIncorrectType(Key key,
-        const std::type_info& storedTypeId, const std::type_info& requestedTypeId) noexcept :
+        const std::type_info& storedTypeId, const std::type_info& requestedTypeId) throw() :
       key_(key), storedTypeId_(storedTypeId), requestedTypeId_(requestedTypeId) {}
 
-    virtual ~ValuesIncorrectType() noexcept {}
+    virtual ~ValuesIncorrectType() throw() {}
 
     /// The key that was attempted to be accessed that does not exist
-    Key key() const noexcept { return key_; }
+    Key key() const throw() { return key_; }
 
     /// The typeid of the value stores in the Values
     const std::type_info& storedTypeId() const { return storedTypeId_; }
@@ -502,18 +495,18 @@ namespace gtsam {
     const std::type_info& requestedTypeId() const { return requestedTypeId_; }
 
     /// The message to be displayed to the user
-    GTSAM_EXPORT const char* what() const noexcept override;
+    GTSAM_EXPORT virtual const char* what() const throw();
   };
 
   /* ************************************************************************* */
   class DynamicValuesMismatched : public std::exception {
 
   public:
-    DynamicValuesMismatched() noexcept {}
+    DynamicValuesMismatched() throw() {}
 
-    virtual ~DynamicValuesMismatched() noexcept {}
+    virtual ~DynamicValuesMismatched() throw() {}
 
-    const char* what() const noexcept override {
+    virtual const char* what() const throw() {
       return "The Values 'this' and the argument passed to Values::localCoordinates have mismatched keys and values";
     }
   };
@@ -529,14 +522,14 @@ namespace gtsam {
     mutable std::string message_;
 
   public:
-    NoMatchFoundForFixed(size_t M1, size_t N1, size_t M2, size_t N2) noexcept :
+    NoMatchFoundForFixed(size_t M1, size_t N1, size_t M2, size_t N2) throw () :
         M1_(M1), N1_(N1), M2_(M2), N2_(N2) {
     }
 
-    virtual ~NoMatchFoundForFixed() noexcept {
+    virtual ~NoMatchFoundForFixed() throw () {
     }
 
-    GTSAM_EXPORT const char* what() const noexcept override;
+    GTSAM_EXPORT virtual const char* what() const throw ();
   };
 
   /* ************************************************************************* */

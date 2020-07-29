@@ -45,7 +45,7 @@ public:
   /// @{
 
   /// print
-  void print(const std::string& s = "") const override {
+  virtual void print(const std::string& s = "") const {
     Base::print(s);
   }
 

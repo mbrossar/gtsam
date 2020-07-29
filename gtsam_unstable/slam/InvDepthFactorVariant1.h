@@ -66,13 +66,13 @@ public:
    * @param keyFormatter optional formatter useful for printing Symbols
    */
   void print(const std::string& s = "InvDepthFactorVariant1",
-      const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+      const KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
     Base::print(s, keyFormatter);
     traits<Point2>::Print(measured_, s + ".z");
   }
 
   /// equals
-  bool equals(const NonlinearFactor& p, double tol = 1e-9) const override {
+  virtual bool equals(const NonlinearFactor& p, double tol = 1e-9) const {
     const This *e = dynamic_cast<const This*>(&p);
     return e
         && Base::equals(p, tol)
@@ -102,7 +102,7 @@ public:
   /// Evaluate error h(x)-z and optionally derivatives
   Vector evaluateError(const Pose3& pose, const Vector6& landmark,
       boost::optional<Matrix&> H1=boost::none,
-      boost::optional<Matrix&> H2=boost::none) const override {
+      boost::optional<Matrix&> H2=boost::none) const {
 
     if (H1) {
       (*H1) = numericalDerivative11<Vector, Pose3>(

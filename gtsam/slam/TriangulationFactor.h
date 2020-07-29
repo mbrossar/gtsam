@@ -90,7 +90,7 @@ public:
   }
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override {
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<gtsam::NonlinearFactor>(
         gtsam::NonlinearFactor::shared_ptr(new This(*this)));
   }
@@ -101,7 +101,7 @@ public:
    * @param keyFormatter optional formatter useful for printing Symbols
    */
   void print(const std::string& s = "", const KeyFormatter& keyFormatter =
-      DefaultKeyFormatter) const override {
+      DefaultKeyFormatter) const {
     std::cout << s << "TriangulationFactor,";
     camera_.print("camera");
     traits<Measurement>::Print(measured_, "z");
@@ -109,7 +109,7 @@ public:
   }
 
   /// equals
-  bool equals(const NonlinearFactor& p, double tol = 1e-9) const override {
+  virtual bool equals(const NonlinearFactor& p, double tol = 1e-9) const {
     const This *e = dynamic_cast<const This*>(&p);
     return e && Base::equals(p, tol) && this->camera_.equals(e->camera_, tol)
         && traits<Measurement>::Equals(this->measured_, e->measured_, tol);
@@ -117,7 +117,7 @@ public:
 
   /// Evaluate error h(x)-z and optionally derivatives
   Vector evaluateError(const Point3& point, boost::optional<Matrix&> H2 =
-      boost::none) const override {
+      boost::none) const {
     try {
       return traits<Measurement>::Local(measured_, camera_.project2(point, boost::none, H2));
     } catch (CheiralityException& e) {
@@ -143,7 +143,7 @@ public:
    * \f$ Ax-b \approx h(x+\delta x)-z = h(x) + A \delta x - z \f$
    * Hence \f$ b = z - h(x) = - \mathtt{error\_vector}(x) \f$
    */
-  boost::shared_ptr<GaussianFactor> linearize(const Values& x) const override {
+  boost::shared_ptr<GaussianFactor> linearize(const Values& x) const {
     // Only linearize if the factor is active
     if (!this->active(x))
       return boost::shared_ptr<JacobianFactor>();

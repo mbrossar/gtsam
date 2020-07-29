@@ -150,7 +150,7 @@ protected:
   }
 
   /// get the dimension (number of rows!) of the factor
-  size_t dim() const override {
+  virtual size_t dim() const {
     return ZDim * this->measured_.size();
   }
 
@@ -173,7 +173,7 @@ protected:
    * @param keyFormatter optional formatter useful for printing Symbols
    */
   void print(const std::string& s = "", const KeyFormatter& keyFormatter =
-      DefaultKeyFormatter) const override {
+      DefaultKeyFormatter) const {
     std::cout << s << "SmartFactorBase, z = \n";
     for (size_t k = 0; k < measured_.size(); ++k) {
       std::cout << "measurement, p = " << measured_[k] << "\t";
@@ -185,7 +185,7 @@ protected:
   }
 
   /// equals
-  bool equals(const NonlinearFactor& p, double tol = 1e-9) const override {
+  virtual bool equals(const NonlinearFactor& p, double tol = 1e-9) const {
     const This *e = dynamic_cast<const This*>(&p);
 
     bool areMeasurementsEqual = true;

@@ -36,7 +36,7 @@ public:
   virtual ~Reconstruction() {}
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override {
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<gtsam::NonlinearFactor>(
         gtsam::NonlinearFactor::shared_ptr(new Reconstruction(*this))); }
 
@@ -44,7 +44,7 @@ public:
   Vector evaluateError(const Pose3& gk1, const Pose3& gk, const Vector6& xik,
       boost::optional<Matrix&> H1 = boost::none,
       boost::optional<Matrix&> H2 = boost::none,
-      boost::optional<Matrix&> H3 = boost::none) const override {
+      boost::optional<Matrix&> H3 = boost::none) const {
 
     Matrix6 D_exphxi_xi;
     Pose3 exphxi = Pose3::Expmap(h_ * xik, H3 ? &D_exphxi_xi : 0);
@@ -98,7 +98,7 @@ public:
   virtual ~DiscreteEulerPoincareHelicopter() {}
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override {
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<gtsam::NonlinearFactor>(
         gtsam::NonlinearFactor::shared_ptr(new DiscreteEulerPoincareHelicopter(*this))); }
 
@@ -110,7 +110,7 @@ public:
   Vector evaluateError(const Vector6& xik, const Vector6& xik_1, const Pose3& gk,
       boost::optional<Matrix&> H1 = boost::none,
       boost::optional<Matrix&> H2 = boost::none,
-      boost::optional<Matrix&> H3 = boost::none) const override {
+      boost::optional<Matrix&> H3 = boost::none) const {
 
     Vector muk = Inertia_*xik;
     Vector muk_1 = Inertia_*xik_1;

@@ -361,7 +361,7 @@ public:
   }
 
   /// return calibration
-  const CALIBRATION& calibration() const override {
+  virtual const CALIBRATION& calibration() const {
     return *K_;
   }
 

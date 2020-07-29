@@ -70,6 +70,7 @@ TEST(ScenarioRunner, Spin) {
   EXPECT(assert_equal(expected, actual, 1e-2));
 #endif
 
+
   // Check calculated covariance against Monte Carlo estimate
   Matrix9 estimatedCov = runner.estimateCovariance(T, 100);
   EXPECT(assert_equal(estimatedCov, pim.preintMeasCov(), 1e-5));

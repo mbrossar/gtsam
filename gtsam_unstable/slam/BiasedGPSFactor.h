@@ -55,7 +55,7 @@ namespace gtsam {
     /** implement functions needed for Testable */
 
     /** print */
-    void print(const std::string& s, const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+    virtual void print(const std::string& s, const KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
       std::cout << s << "BiasedGPSFactor("
           << keyFormatter(this->key1()) << ","
           << keyFormatter(this->key2()) << ")\n"
@@ -64,7 +64,7 @@ namespace gtsam {
     }
 
     /** equals */
-    bool equals(const NonlinearFactor& expected, double tol=1e-9) const override {
+    virtual bool equals(const NonlinearFactor& expected, double tol=1e-9) const {
       const This *e =  dynamic_cast<const This*> (&expected);
       return e != nullptr && Base::equals(*e, tol) && traits<Point3>::Equals(this->measured_, e->measured_, tol);
     }
@@ -74,7 +74,7 @@ namespace gtsam {
     /** vector of errors */
     Vector evaluateError(const Pose3& pose, const Point3& bias,
         boost::optional<Matrix&> H1 = boost::none, boost::optional<Matrix&> H2 =
-            boost::none) const override {
+            boost::none) const {
 
       if (H1 || H2){
         H1->resize(3,6); // jacobian wrt pose

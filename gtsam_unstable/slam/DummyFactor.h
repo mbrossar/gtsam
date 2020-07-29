@@ -34,10 +34,10 @@ public:
   // testable
 
   /** print */
-  void print(const std::string& s = "", const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override;
+  virtual void print(const std::string& s = "", const KeyFormatter& keyFormatter = DefaultKeyFormatter) const;
 
   /** Check if two factors are equal */
-  bool equals(const NonlinearFactor& f, double tol = 1e-9) const override;
+  virtual bool equals(const NonlinearFactor& f, double tol = 1e-9) const;
 
   // access
 
@@ -48,13 +48,13 @@ public:
   /**
    * Calculate the error of the factor - zero for dummy factors
    */
-  double error(const Values& c) const override { return 0.0; }
+  virtual double error(const Values& c) const { return 0.0; }
 
   /** get the dimension of the factor (number of rows on linearization) */
-  size_t dim() const override { return rowDim_; }
+  virtual size_t dim() const { return rowDim_; }
 
   /** linearize to a GaussianFactor */
-  boost::shared_ptr<GaussianFactor> linearize(const Values& c) const override;
+  virtual boost::shared_ptr<GaussianFactor> linearize(const Values& c) const;
 
   /**
    * Creates a shared_ptr clone of the factor - needs to be specialized to allow
@@ -62,7 +62,7 @@ public:
    *
    * By default, throws exception if subclass does not implement the function.
    */
-  NonlinearFactor::shared_ptr clone() const override {
+  virtual NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<NonlinearFactor>(
         NonlinearFactor::shared_ptr(new DummyFactor(*this)));
   }

@@ -71,7 +71,7 @@ public:
   /** implement functions needed for Testable */
 
   /** print */
-  void print(const std::string& s, const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+  virtual void print(const std::string& s, const KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
     std::cout << s << "GaussMarkov1stOrderFactor("
         << keyFormatter(this->key1()) << ","
         << keyFormatter(this->key2()) << ")\n";
@@ -79,7 +79,7 @@ public:
   }
 
   /** equals */
-  bool equals(const NonlinearFactor& expected, double tol=1e-9) const override {
+  virtual bool equals(const NonlinearFactor& expected, double tol=1e-9) const {
     const This *e =  dynamic_cast<const This*> (&expected);
     return e != nullptr && Base::equals(*e, tol);
   }
@@ -89,7 +89,7 @@ public:
   /** vector of errors */
   Vector evaluateError(const VALUE& p1, const VALUE& p2,
       boost::optional<Matrix&> H1 = boost::none,
-      boost::optional<Matrix&> H2 = boost::none) const override {
+      boost::optional<Matrix&> H2 = boost::none) const {
 
     Vector v1( traits<VALUE>::Logmap(p1) );
     Vector v2( traits<VALUE>::Logmap(p2) );

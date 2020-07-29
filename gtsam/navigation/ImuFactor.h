@@ -24,15 +24,16 @@
 /* GTSAM includes */
 #include <gtsam/nonlinear/NonlinearFactor.h>
 #include <gtsam/navigation/ManifoldPreintegration.h>
+#include <gtsam/navigation/LieGroupPreintegration.h>
 #include <gtsam/navigation/TangentPreintegration.h>
 #include <gtsam/base/debug.h>
 
 namespace gtsam {
 
 #ifdef GTSAM_TANGENT_PREINTEGRATION
-typedef TangentPreintegration PreintegrationType;
+typedef LieGroupPreintegration PreintegrationType;
 #else
-typedef ManifoldPreintegration PreintegrationType;
+typedef LieGroupPreintegration PreintegrationType;
 #endif
 
 /*
@@ -217,14 +218,14 @@ public:
   }
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override;
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const;
 
   /// @name Testable
   /// @{
   GTSAM_EXPORT friend std::ostream& operator<<(std::ostream& os, const ImuFactor&);
-  void print(const std::string& s, const KeyFormatter& keyFormatter =
-      DefaultKeyFormatter) const override;
-  bool equals(const NonlinearFactor& expected, double tol = 1e-9) const override;
+  virtual void print(const std::string& s, const KeyFormatter& keyFormatter =
+      DefaultKeyFormatter) const;
+  virtual bool equals(const NonlinearFactor& expected, double tol = 1e-9) const;
   /// @}
 
   /** Access the preintegrated measurements. */
@@ -241,7 +242,7 @@ public:
       const imuBias::ConstantBias& bias_i, boost::optional<Matrix&> H1 =
           boost::none, boost::optional<Matrix&> H2 = boost::none,
       boost::optional<Matrix&> H3 = boost::none, boost::optional<Matrix&> H4 =
-          boost::none, boost::optional<Matrix&> H5 = boost::none) const override;
+          boost::none, boost::optional<Matrix&> H5 = boost::none) const;
 
 #ifdef GTSAM_TANGENT_PREINTEGRATION
   /// Merge two pre-integrated measurement classes
@@ -315,14 +316,14 @@ public:
   }
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override;
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const;
 
   /// @name Testable
   /// @{
   GTSAM_EXPORT friend std::ostream& operator<<(std::ostream& os, const ImuFactor2&);
-  void print(const std::string& s, const KeyFormatter& keyFormatter =
-      DefaultKeyFormatter) const override;
-  bool equals(const NonlinearFactor& expected, double tol = 1e-9) const override;
+  virtual void print(const std::string& s, const KeyFormatter& keyFormatter =
+      DefaultKeyFormatter) const;
+  virtual bool equals(const NonlinearFactor& expected, double tol = 1e-9) const;
   /// @}
 
   /** Access the preintegrated measurements. */
@@ -338,7 +339,7 @@ public:
                        const imuBias::ConstantBias& bias_i,  //
                        boost::optional<Matrix&> H1 = boost::none,
                        boost::optional<Matrix&> H2 = boost::none,
-                       boost::optional<Matrix&> H3 = boost::none) const override;
+                       boost::optional<Matrix&> H3 = boost::none) const;
 
 private:
 

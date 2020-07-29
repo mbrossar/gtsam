@@ -89,23 +89,23 @@ public:
 
   virtual ~ReferenceFrameFactor(){}
 
-  NonlinearFactor::shared_ptr clone() const override {
+  virtual NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<NonlinearFactor>(
         NonlinearFactor::shared_ptr(new This(*this))); }
 
   /** Combined cost and derivative function using boost::optional */
-  Vector evaluateError(const Point& global, const Transform& trans, const Point& local,
+  virtual Vector evaluateError(const Point& global, const Transform& trans, const Point& local,
         boost::optional<Matrix&> Dforeign = boost::none,
         boost::optional<Matrix&> Dtrans = boost::none,
-        boost::optional<Matrix&> Dlocal = boost::none) const override {
+        boost::optional<Matrix&> Dlocal = boost::none) const  {
     Point newlocal = transform_point<Transform,Point>(trans, global, Dtrans, Dforeign);
     if (Dlocal)
       *Dlocal = -1* Matrix::Identity(traits<Point>::dimension, traits<Point>::dimension);
     return traits<Point>::Local(local,newlocal);
   }
 
-  void print(const std::string& s="",
-      const gtsam::KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+  virtual void print(const std::string& s="",
+      const gtsam::KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
     std::cout << s << ": ReferenceFrameFactor("
         << "Global: " << keyFormatter(this->key1()) << ","
         << " Transform: " << keyFormatter(this->key2()) << ","

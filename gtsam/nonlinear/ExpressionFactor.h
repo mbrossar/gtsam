@@ -27,13 +27,8 @@
 namespace gtsam {
 
 /**
- * Factor that supports arbitrary expressions via AD.
- *
- * Arbitrary instances of this template can be directly inserted into a factor
- * graph for optimization. However, to enable the correct (de)serialization of
- * such instances, the user should declare derived classes from this template,
- * implementing expresion(), serialize(), clone(), print(), and defining the
- * corresponding `struct traits<NewFactor> : public Testable<NewFactor> {}`.
+
+ * Factor that supports arbitrary expressions via AD
  */
 template<typename T>
 class ExpressionFactor: public NoiseModelFactor {
@@ -73,13 +68,13 @@ protected:
 
   /// print relies on Testable traits being defined for T
   void print(const std::string& s = "",
-             const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+             const KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
     NoiseModelFactor::print(s, keyFormatter);
     traits<T>::Print(measured_, "ExpressionFactor with measurement: ");
   }
 
   /// equals relies on Testable traits being defined for T
-  bool equals(const NonlinearFactor& f, double tol) const override {
+  bool equals(const NonlinearFactor& f, double tol) const {
     const ExpressionFactor* p = dynamic_cast<const ExpressionFactor*>(&f);
     return p && NoiseModelFactor::equals(f, tol) &&
            traits<T>::Equals(measured_, p->measured_, tol) &&
@@ -91,8 +86,8 @@ protected:
    * We override this method to provide
    * both the function evaluation and its derivative(s) in H.
    */
-  Vector unwhitenedError(const Values& x,
-    boost::optional<std::vector<Matrix>&> H = boost::none) const override {
+  virtual Vector unwhitenedError(const Values& x,
+                                 boost::optional<std::vector<Matrix>&> H = boost::none) const {
     if (H) {
       const T value = expression_.valueAndDerivatives(x, keys_, dims_, *H);
       // NOTE(hayk): Doing the reverse, AKA Local(measured_, value) is not correct here
@@ -104,7 +99,7 @@ protected:
     }
   }
 
-  boost::shared_ptr<GaussianFactor> linearize(const Values& x) const override {
+  virtual boost::shared_ptr<GaussianFactor> linearize(const Values& x) const {
     // Only linearize if the factor is active
     if (!active(x))
       return boost::shared_ptr<JacobianFactor>();
@@ -143,7 +138,7 @@ protected:
   }
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override {
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<gtsam::NonlinearFactor>(
         gtsam::NonlinearFactor::shared_ptr(new This(*this)));
   }
@@ -268,7 +263,7 @@ class ExpressionFactor2 : public ExpressionFactor<T> {
 
  private:
   /// Return an expression that predicts the measurement given Values
-  Expression<T> expression() const override {
+  virtual Expression<T> expression() const {
     return expression(this->keys_[0], this->keys_[1]);
   }
 

@@ -102,7 +102,7 @@ public:
    * @param keyFormatter optional formatter useful for printing Symbols
    */
   void print(const std::string& s = "", const KeyFormatter& keyFormatter =
-      DefaultKeyFormatter) const override {
+      DefaultKeyFormatter) const {
     std::cout << s << "SmartStereoProjectionFactor\n";
     std::cout << "linearizationMode:\n" << params_.linearizationMode << std::endl;
     std::cout << "triangulationParameters:\n" << params_.triangulation << std::endl;
@@ -111,7 +111,7 @@ public:
   }
 
   /// equals
-  bool equals(const NonlinearFactor& p, double tol = 1e-9) const override {
+  virtual bool equals(const NonlinearFactor& p, double tol = 1e-9) const {
     const SmartStereoProjectionFactor *e =
         dynamic_cast<const SmartStereoProjectionFactor*>(&p);
     return e && params_.linearizationMode == e->params_.linearizationMode
@@ -327,8 +327,8 @@ public:
   }
 
   /// linearize
-  boost::shared_ptr<GaussianFactor> linearize(
-      const Values& values) const override {
+  virtual boost::shared_ptr<GaussianFactor> linearize(
+      const Values& values) const {
     return linearizeDamped(values);
   }
 
@@ -438,7 +438,7 @@ public:
   }
 
   /// Calculate total reprojection error
-  double error(const Values& values) const override {
+  virtual double error(const Values& values) const {
     if (this->active(values)) {
       return totalReprojectionError(Base::cameras(values));
     } else { // else of active flag
@@ -449,9 +449,9 @@ public:
   /**
    * This corrects the Jacobians and error vector for the case in which the right pixel in the monocular camera is missing (nan)
    */
-  void correctForMissingMeasurements(const Cameras& cameras, Vector& ue,
+  virtual void correctForMissingMeasurements(const Cameras& cameras, Vector& ue,
       boost::optional<typename Cameras::FBlocks&> Fs = boost::none,
-      boost::optional<Matrix&> E = boost::none) const override
+      boost::optional<Matrix&> E = boost::none) const
   {
     // when using stereo cameras, some of the measurements might be missing:
     for(size_t i=0; i < cameras.size(); i++){

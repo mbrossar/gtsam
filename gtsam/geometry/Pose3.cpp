@@ -106,7 +106,9 @@ Vector6 Pose3::adjointTranspose(const Vector6& xi, const Vector6& y,
 
 /* ************************************************************************* */
 void Pose3::print(const string& s) const {
-  cout << (s.empty() ? s : s + " ") << *this << endl;
+  cout << s;
+  R_.print("R:\n");
+  cout << t_ << ";" << endl;
 }
 
 /* ************************************************************************* */
@@ -437,9 +439,9 @@ boost::optional<Pose3> align(const vector<Point3Pair>& baPointPairs) {
 
 /* ************************************************************************* */
 std::ostream &operator<<(std::ostream &os, const Pose3& pose) {
-  // Both Rot3 and Point3 have ostream definitions so we use them.
-  os << "R: " << pose.rotation() << "\n";
-  os << "t: " << pose.translation();
+  os << pose.rotation() << "\n";
+  const Point3& t = pose.translation();
+  os << '[' << t.x() << ", " << t.y() << ", " << t.z() << "]\';\n";
   return os;
 }
 

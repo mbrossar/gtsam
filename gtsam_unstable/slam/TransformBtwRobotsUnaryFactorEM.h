@@ -97,13 +97,13 @@ namespace gtsam {
 
 
     /** Clone */
-    NonlinearFactor::shared_ptr clone() const override { return boost::make_shared<This>(*this); }
+    virtual NonlinearFactor::shared_ptr clone() const { return boost::make_shared<This>(*this); }
 
 
     /** implement functions needed for Testable */
 
     /** print */
-    void print(const std::string& s, const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+    virtual void print(const std::string& s, const KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
       std::cout << s << "TransformBtwRobotsUnaryFactorEM("
           << keyFormatter(key_) << ")\n";
       std::cout << "MR between factor keys: "
@@ -119,7 +119,7 @@ namespace gtsam {
     }
 
     /** equals */
-    bool equals(const NonlinearFactor& f, double tol=1e-9) const override {
+    virtual bool equals(const NonlinearFactor& f, double tol=1e-9) const {
       const This *t =  dynamic_cast<const This*> (&f);
 
       if(t && Base::equals(f))
@@ -151,7 +151,7 @@ namespace gtsam {
     }
 
     /* ************************************************************************* */
-    double error(const Values& x) const override {
+    virtual double error(const Values& x) const {
       return whitenedError(x).squaredNorm();
     }
 
@@ -162,7 +162,7 @@ namespace gtsam {
      * Hence \f$ b = z - h(x) = - \mathtt{error\_vector}(x) \f$
      */
     /* This version of linearize recalculates the noise model each time */
-    boost::shared_ptr<GaussianFactor> linearize(const Values& x) const override {
+    virtual boost::shared_ptr<GaussianFactor> linearize(const Values& x) const {
       // Only linearize if the factor is active
       if (!this->active(x))
         return boost::shared_ptr<JacobianFactor>();
@@ -406,7 +406,7 @@ namespace gtsam {
       return 1;
     }
 
-    size_t dim() const override {
+    virtual size_t dim() const {
       return model_inlier_->R().rows() + model_inlier_->R().cols();
     }
 

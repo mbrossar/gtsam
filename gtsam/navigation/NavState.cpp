@@ -28,17 +28,23 @@ namespace gtsam {
 NavState NavState::Create(const Rot3& R, const Point3& t, const Velocity3& v,
     OptionalJacobian<9, 3> H1, OptionalJacobian<9, 3> H2,
     OptionalJacobian<9, 3> H3) {
+
   if (H1)
     *H1 << I_3x3, Z_3x3, Z_3x3;
   if (H2)
-    *H2 << Z_3x3, R.transpose(), Z_3x3;
+    *H2 << Z_3x3, R.matrix().transpose(), Z_3x3;
   if (H3)
-    *H3 << Z_3x3, Z_3x3, R.transpose();
+    *H3 << Z_3x3, Z_3x3, R.matrix().transpose();
   return NavState(R, t, v);
 }
 //------------------------------------------------------------------------------
 NavState NavState::FromPoseVelocity(const Pose3& pose, const Vector3& vel,
     OptionalJacobian<9, 6> H1, OptionalJacobian<9, 3> H2) {
+
+  Matrix99 H;
+  ExtendedPose3 tmp(pose.rotation(), vel, pose.translation());
+  tmp.Logmap(tmp, H);
+
   if (H1)
     *H1 << I_3x3, Z_3x3, Z_3x3, I_3x3, Z_3x3, Z_3x3;
   if (H2)
@@ -88,15 +94,15 @@ Matrix7 NavState::matrix() const {
 
 //------------------------------------------------------------------------------
 ostream& operator<<(ostream& os, const NavState& state) {
-  os << "R: " << state.attitude() << "\n";
-  os << "p: " << state.position() << "\n";
-  os << "v: " << Point3(state.velocity());
+  os << "R:" << state.attitude();
+  os << "p:" << state.position() << endl;
+  os << "v:" << Point3(state.velocity()) << endl;
   return os;
 }
 
 //------------------------------------------------------------------------------
 void NavState::print(const string& s) const {
-  cout << (s.empty() ? s : s + " ") << *this << endl;
+  cout << s << *this << endl;
 }
 
 //------------------------------------------------------------------------------
@@ -106,7 +112,16 @@ bool NavState::equals(const NavState& other, double tol) const {
 }
 
 //------------------------------------------------------------------------------
-NavState NavState::retract(const Vector9& xi, //
+NavState NavState::retract(const Vector9& xi, 
+    OptionalJacobian<9, 9> H1, OptionalJacobian<9, 9> H2) const {
+  TIE(nRb, n_t, n_v, *this);
+  ExtendedPose3 T(nRb, n_t, n_v); // flip velocity and position
+  T = T.retract(xi, H1, H2);
+  return NavState(T.rotation(), T.velocity(), T.position());
+}
+
+//------------------------------------------------------------------------------
+NavState NavState::boxplus(const Vector9& xi, //
     OptionalJacobian<9, 9> H1, OptionalJacobian<9, 9> H2) const {
   TIE(nRb, n_t, n_v, *this);
   Matrix3 D_bRc_xi, D_R_nRb, D_t_nRb, D_v_nRb;
@@ -134,23 +149,15 @@ NavState NavState::retract(const Vector9& xi, //
 //------------------------------------------------------------------------------
 Vector9 NavState::localCoordinates(const NavState& g, //
     OptionalJacobian<9, 9> H1, OptionalJacobian<9, 9> H2) const {
-  Matrix3 D_dR_R, D_dt_R, D_dv_R;
-  const Rot3 dR = R_.between(g.R_, H1 ? &D_dR_R : 0);
-  const Point3 dt = R_.unrotate(g.t_ - t_, H1 ? &D_dt_R : 0);
-  const Vector dv = R_.unrotate(g.v_ - v_, H1 ? &D_dv_R : 0);
-
-  Vector9 xi;
-  Matrix3 D_xi_R;
-  xi << Rot3::Logmap(dR, (H1 || H2) ? &D_xi_R : 0), dt, dv;
-  if (H1) {
-    *H1 << D_xi_R * D_dR_R, Z_3x3, Z_3x3, //
-    D_dt_R, -I_3x3, Z_3x3, //
-    D_dv_R, Z_3x3, -I_3x3;
-  }
+      const ExtendedPose3 T0(R_, t_, v_);
+      const ExtendedPose3 T(g.R_, g.t_, g.v_);
+      const ExtendedPose3 DeltaT(T0.inverse()*T);
+      const Vector9 xi = T.Logmap(DeltaT, H1);
   if (H2) {
-    *H2 << D_xi_R, Z_3x3, Z_3x3, //
-    Z_3x3, dR.matrix(), Z_3x3, //
-    Z_3x3, Z_3x3, dR.matrix();
+    *H2 = *H1;
+  }
+  if (H1) {
+    *H1 = -DeltaT.AdjointMap() * (*H1);
   }
   return xi;
 }
@@ -184,7 +191,7 @@ NavState NavState::update(const Vector3& b_acceleration, const Vector3& b_omega,
 
   // Bring back to manifold
   Matrix9 D_newState_xi;
-  NavState newState = retract(xi, F, G1 || G2 ? &D_newState_xi : 0);
+  NavState newState = boxplus(xi, F, G1 || G2 ? &D_newState_xi : 0);
 
   // Derivative wrt state is computed by retract directly
   // However, as dP(xi) also depends on state, we need to add that contribution
@@ -219,10 +226,15 @@ Vector9 NavState::coriolis(double dt, const Vector3& omega, bool secondOrder,
   const Vector3 omega_cross_vel = omega.cross(n_v);
 
   Vector9 xi;
-  Matrix3 D_dP_R;
+  Matrix3 D_dP_R, D_dP_dR, D_dV_dR;
   dR(xi) << nRb.unrotate((-dt) * omega, H ? &D_dP_R : 0);
-  dP(xi) << ((-dt2) * omega_cross_vel); // NOTE(luca): we got rid of the 2 wrt INS paper
-  dV(xi) << ((-2.0 * dt) * omega_cross_vel);
+  // new implementation
+  dP(xi) << nRb.unrotate((-dt2) * omega_cross_vel, H ? &D_dP_dR : 0);
+  dV(xi) << nRb.unrotate((-2.0 * dt) * omega_cross_vel, H ? &D_dV_dR : 0);
+  // prev implementation
+  //dP(xi) << ((-dt2) * omega_cross_vel);
+  //dV(xi) << ((-2.0 * dt) * omega_cross_vel);
+
   if (secondOrder) {
     const Vector3 omega_cross2_t = omega.cross(omega.cross(n_t));
     dP(xi) -= (0.5 * dt2) * omega_cross2_t;
@@ -234,8 +246,15 @@ Vector9 NavState::coriolis(double dt, const Vector3& omega, bool secondOrder,
     const Matrix3 D_cross_state = Omega * R();
     H->setZero();
     D_R_R(H) << D_dP_R;
-    D_t_v(H) << (-dt2) * D_cross_state;
-    D_v_v(H) << (-2.0 * dt) * D_cross_state;
+    // new implementation
+    D_t_v(H) << nRb.transpose() * (-dt2) * D_cross_state;
+    D_v_v(H) << nRb.transpose() * (-2.0 * dt) * D_cross_state;
+    D_t_R(H) << D_dP_dR;
+    D_v_R(H) << D_dV_dR;
+    // prev implementation
+    //D_t_v(H) <<  (-dt2) * D_cross_state;
+    //D_v_v(H) <<  (-2.0 * dt) * D_cross_state;
+
     if (secondOrder) {
       const Matrix3 D_cross2_state = Omega * D_cross_state;
       D_t_t(H) -= (0.5 * dt2) * D_cross2_state;
@@ -252,35 +271,63 @@ Vector9 NavState::correctPIM(const Vector9& pim, double dt,
     OptionalJacobian<9, 9> H2) const {
   const Rot3& nRb = R_;
   const Velocity3& n_v = v_; // derivative is Ri !
+  const Point3& n_t = t_; // derivative is Ri !
   const double dt22 = 0.5 * dt * dt;
 
   Vector9 xi;
-  Matrix3 D_dP_Ri1, D_dP_Ri2, D_dP_nv, D_dV_Ri;
-  dR(xi) = dR(pim);
-  dP(xi) = dP(pim)
-      + dt * nRb.unrotate(n_v, H1 ? &D_dP_Ri1 : 0, H2 ? &D_dP_nv : 0)
-      + dt22 * nRb.unrotate(n_gravity, H1 ? &D_dP_Ri2 : 0);
-  dV(xi) = dV(pim) + dt * nRb.unrotate(n_gravity, H1 ? &D_dV_Ri : 0);
+  Matrix3 D_dP_Ri, D_dV_Ri, D_dP_Gx, D_dV_Gv;
+  Matrix3 D_Gx_nt = Matrix::Zero(3, 3);
+  Matrix3 D_Gv_nt = Matrix::Zero(3, 3);
+  Matrix3 D_Gx_nv = dt * Matrix::Identity(3, 3);
 
+  Vector3 Gamma_v, Gamma_p;
   if (omegaCoriolis) {
-    xi += coriolis(dt, *omegaCoriolis, use2ndOrderCoriolis, H1);
+    Vector6 omega_n_gravity;
+    omega_n_gravity << -(*omegaCoriolis)*dt, n_gravity*dt;
+    Pose3 pose = Pose3::Expmap(omega_n_gravity);
+    Rot3 Gamma_R = pose.rotation();
+    Matrix3 GOmGt = skewSymmetric(Gamma_R.rotate(*omegaCoriolis));
+    Vector3 n_v_prime = n_v + GOmGt * n_t;
+
+    // add initial state contribution
+    Gamma_v = pose.translation() + GOmGt * n_t;
+    // add velocity and initial position contribution
+    Matrix3 Omega = skewSymmetric(*omegaCoriolis);
+    double phi = (*omegaCoriolis).norm();
+    double c = phi * dt;
+    double phi3 = phi * phi * phi;
+    double phi4 = phi3 * phi;
+    double a = (c * cos(c) - sin(c)) /(phi3);
+    double b = (c*c/2 - cos(c) - c*sin(c) + 1) / (phi4);
+    Matrix3 mat = dt22 * Matrix::Identity(3, 3);
+    mat += a * Omega + b * Omega * Omega;
+    Gamma_p =  dt * n_v_prime + mat * n_gravity;
+
+    D_Gv_nt = GOmGt;
+    D_Gx_nt = dt * GOmGt;
+  } else {
+    Gamma_v = dt * n_gravity;
+    Gamma_p = dt * n_v  + dt22 * n_gravity;
   }
+  dR(xi) = dR(pim);
+  dP(xi) = dP(pim)+nRb.unrotate(Gamma_p, H1 ? &D_dP_Ri : 0, H1 ? &D_dP_Gx : 0);
+  dV(xi) = dV(pim)+nRb.unrotate(Gamma_v, H1 ? &D_dV_Ri : 0, H1 ? &D_dV_Gv : 0);
 
   if (H1 || H2) {
     Matrix3 Ri = nRb.matrix();
 
     if (H1) {
-      if (!omegaCoriolis)
-        H1->setZero(); // if coriolis H1 is already initialized
-      D_t_R(H1) += dt * D_dP_Ri1 + dt22 * D_dP_Ri2;
-      D_t_v(H1) += dt * D_dP_nv * Ri;
-      D_v_R(H1) += dt * D_dV_Ri;
+      H1->setZero(); // if coriolis H1 is already initialized
+      D_t_R(H1) += D_dP_Ri;
+      D_t_v(H1) += D_dP_Gx * D_Gx_nv * Ri;
+      D_v_R(H1) += D_dV_Ri;
+      D_t_t(H1) += D_dP_Gx * D_Gx_nt * Ri;
+      D_v_t(H1) += D_dV_Gv * D_Gv_nt * Ri;
     }
     if (H2) {
       H2->setIdentity();
     }
   }
-
   return xi;
 }
 //------------------------------------------------------------------------------

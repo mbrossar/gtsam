@@ -144,43 +144,43 @@ private:
     return static_cast<const Derived&>(*this);
   }
 
-  void _print(const std::string& indent) const override {
+  virtual void _print(const std::string& indent) const {
     derived().print(indent);
   }
 
   // Called from base class non-virtual inline method startReverseAD2
   // Calls non-virtual function startReverseAD4, implemented in Derived (ExpressionNode::Record)
-  void _startReverseAD3(JacobianMap& jacobians) const override {
+  virtual void _startReverseAD3(JacobianMap& jacobians) const {
     derived().startReverseAD4(jacobians);
   }
 
-  void _reverseAD3(const Matrix & dFdT, JacobianMap& jacobians) const override {
+  virtual void _reverseAD3(const Matrix & dFdT, JacobianMap& jacobians) const {
     derived().reverseAD4(dFdT, jacobians);
   }
 
-  void _reverseAD3(
+  virtual void _reverseAD3(
       const Eigen::Matrix<double, Eigen::Dynamic, Cols> & dFdT,
-      JacobianMap& jacobians) const override {
+      JacobianMap& jacobians) const {
     derived().reverseAD4(dFdT, jacobians);
   }
-  void _reverseAD3(const Eigen::Matrix<double, 1, Cols> & dFdT,
-      JacobianMap& jacobians) const override {
+  virtual void _reverseAD3(const Eigen::Matrix<double, 1, Cols> & dFdT,
+      JacobianMap& jacobians) const {
     derived().reverseAD4(dFdT, jacobians);
   }
-  void _reverseAD3(const Eigen::Matrix<double, 2, Cols> & dFdT,
-      JacobianMap& jacobians) const override {
+  virtual void _reverseAD3(const Eigen::Matrix<double, 2, Cols> & dFdT,
+      JacobianMap& jacobians) const {
     derived().reverseAD4(dFdT, jacobians);
   }
-  void _reverseAD3(const Eigen::Matrix<double, 3, Cols> & dFdT,
-      JacobianMap& jacobians) const override {
+  virtual void _reverseAD3(const Eigen::Matrix<double, 3, Cols> & dFdT,
+      JacobianMap& jacobians) const {
     derived().reverseAD4(dFdT, jacobians);
   }
-  void _reverseAD3(const Eigen::Matrix<double, 4, Cols> & dFdT,
-      JacobianMap& jacobians) const override {
+  virtual void _reverseAD3(const Eigen::Matrix<double, 4, Cols> & dFdT,
+      JacobianMap& jacobians) const {
     derived().reverseAD4(dFdT, jacobians);
   }
-  void _reverseAD3(const Eigen::Matrix<double, 5, Cols> & dFdT,
-      JacobianMap& jacobians) const override {
+  virtual void _reverseAD3(const Eigen::Matrix<double, 5, Cols> & dFdT,
+      JacobianMap& jacobians) const {
     derived().reverseAD4(dFdT, jacobians);
   }
 };

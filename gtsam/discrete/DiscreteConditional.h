@@ -85,10 +85,10 @@ public:
 
   /// GTSAM-style print
   void print(const std::string& s = "Discrete Conditional: ",
-      const KeyFormatter& formatter = DefaultKeyFormatter) const override;
+      const KeyFormatter& formatter = DefaultKeyFormatter) const;
 
   /// GTSAM-style equals
-  bool equals(const DiscreteFactor& other, double tol = 1e-9) const override;
+  bool equals(const DiscreteFactor& other, double tol = 1e-9) const;
 
   /// @}
   /// @name Standard Interface
@@ -102,7 +102,7 @@ public:
   }
 
   /// Evaluate, just look up in AlgebraicDecisonTree
-  double operator()(const Values& values) const override {
+  virtual double operator()(const Values& values) const {
     return Potentials::operator()(values);
   }
 

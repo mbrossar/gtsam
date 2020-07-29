@@ -43,22 +43,22 @@ public:
   virtual ~RelativeElevationFactor() {}
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override {
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<gtsam::NonlinearFactor>(
         gtsam::NonlinearFactor::shared_ptr(new This(*this))); }
 
   /** h(x)-z */
   Vector evaluateError(const Pose3& pose, const Point3& point,
-      boost::optional<Matrix&> H1 = boost::none, boost::optional<Matrix&> H2 = boost::none) const override;
+      boost::optional<Matrix&> H1 = boost::none, boost::optional<Matrix&> H2 = boost::none) const;
 
   /** return the measured */
   inline double measured() const { return measured_; }
 
   /** equals specialized to this factor */
-  bool equals(const NonlinearFactor& expected, double tol=1e-9) const override;
+  virtual bool equals(const NonlinearFactor& expected, double tol=1e-9) const;
 
   /** print contents */
-  void print(const std::string& s="", const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override;
+  void print(const std::string& s="", const KeyFormatter& keyFormatter = DefaultKeyFormatter) const;
 
 private:
 

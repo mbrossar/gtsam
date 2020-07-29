@@ -70,13 +70,13 @@ public:
    * @param keyFormatter optional formatter useful for printing Symbols
    */
   void print(const std::string& s = "InvDepthFactor3",
-      const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+      const KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
     Base::print(s, keyFormatter);
     traits<Point2>::Print(measured_, s + ".z");
   }
 
   /// equals
-  bool equals(const NonlinearFactor& p, double tol = 1e-9) const override {
+  virtual bool equals(const NonlinearFactor& p, double tol = 1e-9) const {
     const This *e = dynamic_cast<const This*>(&p);
     return e && Base::equals(p, tol) && traits<Point2>::Equals(this->measured_, e->measured_, tol) && this->K_->equals(*e->K_, tol);
   }
@@ -85,7 +85,7 @@ public:
   Vector evaluateError(const POSE& pose, const Vector5& point, const INVDEPTH& invDepth,
       boost::optional<Matrix&> H1=boost::none,
       boost::optional<Matrix&> H2=boost::none,
-      boost::optional<Matrix&> H3=boost::none) const override {
+      boost::optional<Matrix&> H3=boost::none) const {
     try {
       InvDepthCamera3<Cal3_S2> camera(pose, K_);
       return camera.project(point, invDepth, H1, H2, H3) - measured_;

@@ -100,7 +100,7 @@ namespace gtsam {
     bool equals(const DERIVED& other, double tol = 1e-9) const;
 
     /** print this node */
-    virtual void print(const std::string& s = "", const KeyFormatter& keyFormatter = DefaultKeyFormatter) const;
+    void print(const std::string& s = "", const KeyFormatter& keyFormatter = DefaultKeyFormatter) const;
 
     /// @}
     /// @name Standard Interface

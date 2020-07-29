@@ -175,7 +175,7 @@ public:
   }
 
   /// return calibration
-  const Calibration& calibration() const override {
+  const Calibration& calibration() const {
     return K_;
   }
 

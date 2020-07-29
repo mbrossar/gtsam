@@ -89,18 +89,18 @@ public:
   }
 
   /** equals */
-  bool equals(const GaussianFactor& lf, double tol = 1e-9) const override {
+  virtual bool equals(const GaussianFactor& lf, double tol = 1e-9) const {
     return Base::equals(lf, tol);
   }
 
   /** print */
-  void print(const std::string& s = "", const KeyFormatter& formatter =
-      DefaultKeyFormatter) const override {
+  virtual void print(const std::string& s = "", const KeyFormatter& formatter =
+      DefaultKeyFormatter) const {
     Base::print(s, formatter);
   }
 
   /** Clone this LinearEquality */
-  GaussianFactor::shared_ptr clone() const override {
+  virtual GaussianFactor::shared_ptr clone() const {
     return boost::static_pointer_cast < GaussianFactor
         > (boost::make_shared < LinearEquality > (*this));
   }
@@ -124,7 +124,7 @@ public:
    * I think it should be zero, as this function is meant for objective cost.
    * But the name "error" can be misleading.
    * TODO: confirm with Frank!! */
-  double error(const VectorValues& c) const override {
+  virtual double error(const VectorValues& c) const {
     return 0.0;
   }
 

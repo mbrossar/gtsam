@@ -337,7 +337,7 @@ struct UnaryFactor: public gtsam::NoiseModelFactor1<Point2> {
     gtsam::NoiseModelFactor1<Point2>(model, key), z_(z) {
   }
 
-  Vector evaluateError(const Point2& x, boost::optional<Matrix&> A = boost::none) const override {
+  Vector evaluateError(const Point2& x, boost::optional<Matrix&> A = boost::none) const {
     if (A) *A = H(x);
     return (h(x) - z_);
   }

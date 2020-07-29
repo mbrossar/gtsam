@@ -63,14 +63,14 @@ namespace gtsam {
     virtual ~BetweenFactor() {}
 
     /// @return a deep copy of this factor
-    gtsam::NonlinearFactor::shared_ptr clone() const override {
+    virtual gtsam::NonlinearFactor::shared_ptr clone() const {
       return boost::static_pointer_cast<gtsam::NonlinearFactor>(
           gtsam::NonlinearFactor::shared_ptr(new This(*this))); }
 
     /** implement functions needed for Testable */
 
     /** print */
-    void print(const std::string& s, const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+    virtual void print(const std::string& s, const KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
       std::cout << s << "BetweenFactor("
           << keyFormatter(this->key1()) << ","
           << keyFormatter(this->key2()) << ")\n";
@@ -79,7 +79,7 @@ namespace gtsam {
     }
 
     /** equals */
-    bool equals(const NonlinearFactor& expected, double tol=1e-9) const override {
+    virtual bool equals(const NonlinearFactor& expected, double tol=1e-9) const {
       const This *e =  dynamic_cast<const This*> (&expected);
       return e != nullptr && Base::equals(*e, tol) && traits<T>::Equals(this->measured_, e->measured_, tol);
     }
@@ -87,8 +87,8 @@ namespace gtsam {
     /** implement functions needed to derive from Factor */
 
     /** vector of errors */
-    Vector evaluateError(const T& p1, const T& p2, boost::optional<Matrix&> H1 =
-      boost::none, boost::optional<Matrix&> H2 = boost::none) const override {
+  Vector evaluateError(const T& p1, const T& p2, boost::optional<Matrix&> H1 =
+      boost::none, boost::optional<Matrix&> H2 = boost::none) const {
       T hx = traits<T>::Between(p1, p2, H1, H2); // h(x)
       // manifold equivalent of h(x)-z -> log(z,h(x))
 #ifdef SLOW_BUT_CORRECT_BETWEENFACTOR

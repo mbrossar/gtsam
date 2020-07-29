@@ -84,8 +84,8 @@ public:
   /** implement functions needed for Testable */
 
   /** print */
-  void print(const std::string& s, const KeyFormatter& keyFormatter =
-      DefaultKeyFormatter) const override {
+  virtual void print(const std::string& s, const KeyFormatter& keyFormatter =
+      DefaultKeyFormatter) const {
     std::cout << s << "BetweenFactorEM(" << keyFormatter(key1_) << ","
         << keyFormatter(key2_) << ")\n";
     measured_.print("  measured: ");
@@ -97,7 +97,7 @@ public:
   }
 
   /** equals */
-  bool equals(const NonlinearFactor& f, double tol = 1e-9) const override {
+  virtual bool equals(const NonlinearFactor& f, double tol = 1e-9) const {
     const This *t = dynamic_cast<const This*>(&f);
 
     if (t && Base::equals(f))
@@ -408,7 +408,7 @@ public:
     return 2;
   }
 
-  size_t dim() const override {
+  virtual size_t dim() const {
     return model_inlier_->R().rows() + model_inlier_->R().cols();
   }
 

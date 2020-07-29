@@ -60,10 +60,10 @@ public:
   virtual ~ConcurrentBatchSmoother() {};
 
   /** Implement a GTSAM standard 'print' function */
-  void print(const std::string& s = "Concurrent Batch Smoother:\n", const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override;
+  virtual void print(const std::string& s = "Concurrent Batch Smoother:\n", const KeyFormatter& keyFormatter = DefaultKeyFormatter) const;
 
   /** Check if two Concurrent Smoothers are equal */
-  bool equals(const ConcurrentSmoother& rhs, double tol = 1e-9) const override;
+  virtual bool equals(const ConcurrentSmoother& rhs, double tol = 1e-9) const;
 
   /** Access the current set of factors */
   const NonlinearFactorGraph& getFactors() const {
@@ -124,7 +124,7 @@ public:
    * Perform any required operations before the synchronization process starts.
    * Called by 'synchronize'
    */
-  virtual void presync() override;
+  virtual void presync();
 
   /**
    * Populate the provided containers with factors that constitute the smoother branch summarization
@@ -132,7 +132,7 @@ public:
    *
    * @param summarizedFactors The summarized factors for the filter branch
    */
-  void getSummarizedFactors(NonlinearFactorGraph& summarizedFactors, Values& separatorValues) override;
+  virtual void getSummarizedFactors(NonlinearFactorGraph& summarizedFactors, Values& separatorValues);
 
   /**
    * Apply the new smoother factors sent by the filter, and the updated version of the filter
@@ -143,14 +143,14 @@ public:
    * @param summarizedFactors An updated version of the filter branch summarized factors
    * @param rootValues The linearization point of the root variables
    */
-  void synchronize(const NonlinearFactorGraph& smootherFactors, const Values& smootherValues,
-      const NonlinearFactorGraph& summarizedFactors, const Values& separatorValues) override;
+  virtual void synchronize(const NonlinearFactorGraph& smootherFactors, const Values& smootherValues,
+      const NonlinearFactorGraph& summarizedFactors, const Values& separatorValues);
 
   /**
    * Perform any required operations after the synchronization process finishes.
    * Called by 'synchronize'
    */
-  virtual void postsync() override;
+  virtual void postsync();
 
 protected:
 

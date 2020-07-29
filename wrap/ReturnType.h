@@ -30,7 +30,7 @@ struct ReturnType : public Qualified {
   ReturnType(const std::string& name, Category c = CLASS, bool ptr = false)
       : Qualified(name, c), isPtr(ptr) {}
 
-  void clear() override {
+  virtual void clear() {
     Qualified::clear();
     isPtr = false;
   }

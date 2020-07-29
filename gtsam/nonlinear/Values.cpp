@@ -53,12 +53,6 @@ namespace gtsam {
   }
 
   /* ************************************************************************* */
-  Values::Values(std::initializer_list<ConstKeyValuePair> init) {
-    for (const auto &kv : init)
-      insert(kv.key, kv.value);
-  }
-
-  /* ************************************************************************* */
   Values::Values(const Values& other, const VectorValues& delta) {
     for (const_iterator key_value = other.begin(); key_value != other.end(); ++key_value) {
       VectorValues::const_iterator it = delta.find(key_value->key);
@@ -220,7 +214,7 @@ namespace gtsam {
   }
 
   /* ************************************************************************* */
-  const char* ValuesKeyAlreadyExists::what() const noexcept {
+  const char* ValuesKeyAlreadyExists::what() const throw() {
     if(message_.empty())
       message_ =
           "Attempting to add a key-value pair with key \"" + DefaultKeyFormatter(key_) + "\", key already exists.";
@@ -228,7 +222,7 @@ namespace gtsam {
   }
 
   /* ************************************************************************* */
-  const char* ValuesKeyDoesNotExist::what() const noexcept {
+  const char* ValuesKeyDoesNotExist::what() const throw() {
     if(message_.empty())
       message_ =
           "Attempting to " + std::string(operation_) + " the key \"" +
@@ -237,7 +231,7 @@ namespace gtsam {
   }
 
   /* ************************************************************************* */
-  const char* ValuesIncorrectType::what() const noexcept {
+  const char* ValuesIncorrectType::what() const throw() {
     if(message_.empty()) {
       std::string storedTypeName = demangle(storedTypeId_.name());
       std::string requestedTypeName = demangle(requestedTypeId_.name());
@@ -257,7 +251,7 @@ namespace gtsam {
   }
 
   /* ************************************************************************* */
-  const char* NoMatchFoundForFixed::what() const noexcept {
+  const char* NoMatchFoundForFixed::what() const throw() {
     if(message_.empty()) {
       ostringstream oss;
     oss

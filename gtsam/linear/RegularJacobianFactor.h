@@ -70,8 +70,8 @@ public:
   using JacobianFactor::multiplyHessianAdd;
 
   /** y += alpha * A'*A*x */
-  void multiplyHessianAdd(double alpha, const VectorValues& x,
-      VectorValues& y) const override {
+  virtual void multiplyHessianAdd(double alpha, const VectorValues& x,
+      VectorValues& y) const {
     JacobianFactor::multiplyHessianAdd(alpha, x, y);
   }
 
@@ -106,7 +106,7 @@ public:
   using GaussianFactor::hessianDiagonal;
 
   /// Raw memory access version of hessianDiagonal
-  void hessianDiagonal(double* d) const override {
+  void hessianDiagonal(double* d) const {
     // Loop over all variables in the factor
     for (DenseIndex j = 0; j < (DenseIndex) size(); ++j) {
       // Get the diagonal block, and insert its diagonal
@@ -125,12 +125,12 @@ public:
   }
 
   /// Expose base class gradientAtZero
-  VectorValues gradientAtZero() const override {
+  virtual VectorValues gradientAtZero() const {
     return JacobianFactor::gradientAtZero();
   }
 
   /// Raw memory access version of gradientAtZero
-  void gradientAtZero(double* d) const override {
+  void gradientAtZero(double* d) const {
 
     // Get vector b not weighted
     Vector b = getb();

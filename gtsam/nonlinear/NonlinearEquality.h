@@ -107,15 +107,15 @@ public:
   /// @name Testable
   /// @{
 
-  void print(const std::string& s = "",
-      const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+  virtual void print(const std::string& s = "",
+      const KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
     std::cout << s << "Constraint: on [" << keyFormatter(this->key()) << "]\n";
     traits<VALUE>::Print(feasible_, "Feasible Point:\n");
     std::cout << "Variable Dimension: " << traits<T>::GetDimension(feasible_) << std::endl;
   }
 
   /** Check if two factors are equal */
-  bool equals(const NonlinearFactor& f, double tol = 1e-9) const override {
+  virtual bool equals(const NonlinearFactor& f, double tol = 1e-9) const {
     const This* e = dynamic_cast<const This*>(&f);
     return e && Base::equals(f) && traits<T>::Equals(feasible_,e->feasible_, tol)
         && std::abs(error_gain_ - e->error_gain_) < tol;
@@ -126,7 +126,7 @@ public:
   /// @{
 
   /** actual error function calculation */
-  double error(const Values& c) const override {
+  virtual double error(const Values& c) const {
     const T& xj = c.at<T>(this->key());
     Vector e = this->unwhitenedError(c);
     if (allow_error_ || !compare_(xj, feasible_)) {
@@ -138,7 +138,7 @@ public:
 
   /** error function */
   Vector evaluateError(const T& xj,
-      boost::optional<Matrix&> H = boost::none) const override {
+      boost::optional<Matrix&> H = boost::none) const {
     const size_t nj = traits<T>::GetDimension(feasible_);
     if (allow_error_) {
       if (H)
@@ -158,7 +158,7 @@ public:
   }
 
   // Linearize is over-written, because base linearization tries to whiten
-  GaussianFactor::shared_ptr linearize(const Values& x) const override {
+  virtual GaussianFactor::shared_ptr linearize(const Values& x) const {
     const T& xj = x.at<T>(this->key());
     Matrix A;
     Vector b = evaluateError(xj, A);
@@ -168,7 +168,7 @@ public:
   }
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override {
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<gtsam::NonlinearFactor>(
         gtsam::NonlinearFactor::shared_ptr(new This(*this)));
   }
@@ -242,14 +242,14 @@ public:
   }
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override {
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<gtsam::NonlinearFactor>(
         gtsam::NonlinearFactor::shared_ptr(new This(*this)));
   }
 
   /** g(x) with optional derivative */
   Vector evaluateError(const X& x1,
-      boost::optional<Matrix&> H = boost::none) const override {
+      boost::optional<Matrix&> H = boost::none) const {
     if (H)
       (*H) = Matrix::Identity(traits<X>::GetDimension(x1),traits<X>::GetDimension(x1));
     // manifold equivalent of h(x)-z -> log(z,h(x))
@@ -257,8 +257,8 @@ public:
   }
 
   /** Print */
-  void print(const std::string& s = "",
-      const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+  virtual void print(const std::string& s = "",
+      const KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
     std::cout << s << ": NonlinearEquality1(" << keyFormatter(this->key())
         << ")," << "\n";
     this->noiseModel_->print();
@@ -317,14 +317,14 @@ public:
   }
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override {
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<gtsam::NonlinearFactor>(
         gtsam::NonlinearFactor::shared_ptr(new This(*this)));
   }
 
   /** g(x) with optional derivative2 */
   Vector evaluateError(const X& x1, const X& x2, boost::optional<Matrix&> H1 =
-      boost::none, boost::optional<Matrix&> H2 = boost::none) const override {
+      boost::none, boost::optional<Matrix&> H2 = boost::none) const {
     static const size_t p = traits<X>::dimension;
     if (H1) *H1 = -Matrix::Identity(p,p);
     if (H2) *H2 =  Matrix::Identity(p,p);

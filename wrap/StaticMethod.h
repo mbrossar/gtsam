@@ -41,10 +41,10 @@ struct StaticMethod: public MethodBase {
 
 protected:
 
-  void proxy_header(FileWriter& proxyFile) const override;
+  virtual void proxy_header(FileWriter& proxyFile) const;
 
-  std::string wrapper_call(FileWriter& wrapperFile, Str cppClassName,
-      Str matlabUniqueName, const ArgumentList& args) const override;
+  virtual std::string wrapper_call(FileWriter& wrapperFile, Str cppClassName,
+      Str matlabUniqueName, const ArgumentList& args) const;
 };
 
 } // \namespace wrap

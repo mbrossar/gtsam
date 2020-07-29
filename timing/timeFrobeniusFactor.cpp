@@ -31,7 +31,6 @@
 #include <gtsam/slam/FrobeniusFactor.h>
 
 #include <iostream>
-#include <random>
 #include <string>
 #include <vector>
 
@@ -74,10 +73,10 @@ int main(int argc, char* argv[]) {
     const auto& Tij = factor->measured();
     const auto& model = factor->noiseModel();
     graph.emplace_shared<FrobeniusWormholeFactor>(
-        keys[0], keys[1], Rot3(Tij.rotation().matrix()), 4, model);
+        keys[0], keys[1], SO3(Tij.rotation().matrix()), model);
   }
 
-  std::mt19937 rng(42);
+  boost::mt19937 rng(42);
 
   // Set parameters to be similar to ceres
   LevenbergMarquardtParams params;

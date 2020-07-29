@@ -31,7 +31,7 @@
 
 #ifdef GTSAM_ALLOW_DEPRECATED_SINCE_V4
 #define ADD_CLONE_NONLINEAR_FACTOR(Derived) \
-  gtsam::NonlinearFactor::shared_ptr clone() const override { \
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const { \
   return boost::static_pointer_cast<gtsam::NonlinearFactor>( \
       gtsam::NonlinearFactor::shared_ptr(new Derived(*this))); }
 #endif
@@ -195,14 +195,14 @@ protected:
 public:
 
   /** Print */
-  void print(const std::string& s = "",
-    const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override;
+  virtual void print(const std::string& s = "",
+    const KeyFormatter& keyFormatter = DefaultKeyFormatter) const;
 
   /** Check if two factors are equal */
-  bool equals(const NonlinearFactor& f, double tol = 1e-9) const override;
+  virtual bool equals(const NonlinearFactor& f, double tol = 1e-9) const;
 
   /** get the dimension of the factor (number of rows on linearization) */
-  size_t dim() const override {
+  virtual size_t dim() const {
     return noiseModel_->dim();
   }
 
@@ -242,14 +242,14 @@ public:
    * In this class, we take the raw prediction error \f$ h(x)-z \f$, ask the noise model
    * to transform it to \f$ (h(x)-z)^2/\sigma^2 \f$, and then multiply by 0.5.
    */
-  double error(const Values& c) const override;
+  virtual double error(const Values& c) const;
 
   /**
    * Linearize a non-linearFactorN to get a GaussianFactor,
    * \f$ Ax-b \approx h(x+\delta x)-z = h(x) + A \delta x - z \f$
    * Hence \f$ b = z - h(x) = - \mathtt{error\_vector}(x) \f$
    */
-  boost::shared_ptr<GaussianFactor> linearize(const Values& x) const override;
+  boost::shared_ptr<GaussianFactor> linearize(const Values& x) const;
 
 #ifdef GTSAM_ALLOW_DEPRECATED_SINCE_V4
   /// @name Deprecated
@@ -315,7 +315,7 @@ public:
   /** Calls the 1-key specific version of evaluateError, which is pure virtual
    *  so must be implemented in the derived class.
    */
-  Vector unwhitenedError(const Values& x, boost::optional<std::vector<Matrix>&> H = boost::none) const override {
+  virtual Vector unwhitenedError(const Values& x, boost::optional<std::vector<Matrix>&> H = boost::none) const {
     if(this->active(x)) {
       const X& x1 = x.at<X>(keys_[0]);
       if(H) {
@@ -389,7 +389,7 @@ public:
 
   /** Calls the 2-key specific version of evaluateError, which is pure virtual
    * so must be implemented in the derived class. */
-  Vector unwhitenedError(const Values& x, boost::optional<std::vector<Matrix>&> H = boost::none) const override {
+  virtual Vector unwhitenedError(const Values& x, boost::optional<std::vector<Matrix>&> H = boost::none) const {
     if(this->active(x)) {
       const X1& x1 = x.at<X1>(keys_[0]);
       const X2& x2 = x.at<X2>(keys_[1]);
@@ -467,7 +467,7 @@ public:
 
   /** Calls the 3-key specific version of evaluateError, which is pure virtual
    * so must be implemented in the derived class. */
-  Vector unwhitenedError(const Values& x, boost::optional<std::vector<Matrix>&> H = boost::none) const override {
+  virtual Vector unwhitenedError(const Values& x, boost::optional<std::vector<Matrix>&> H = boost::none) const {
     if(this->active(x)) {
       if(H)
         return evaluateError(x.at<X1>(keys_[0]), x.at<X2>(keys_[1]), x.at<X3>(keys_[2]), (*H)[0], (*H)[1], (*H)[2]);
@@ -547,7 +547,7 @@ public:
 
   /** Calls the 4-key specific version of evaluateError, which is pure virtual
    * so must be implemented in the derived class. */
-  Vector unwhitenedError(const Values& x, boost::optional<std::vector<Matrix>&> H = boost::none) const override {
+  virtual Vector unwhitenedError(const Values& x, boost::optional<std::vector<Matrix>&> H = boost::none) const {
     if(this->active(x)) {
       if(H)
         return evaluateError(x.at<X1>(keys_[0]), x.at<X2>(keys_[1]), x.at<X3>(keys_[2]), x.at<X4>(keys_[3]), (*H)[0], (*H)[1], (*H)[2], (*H)[3]);
@@ -631,7 +631,7 @@ public:
 
   /** Calls the 5-key specific version of evaluateError, which is pure virtual
    * so must be implemented in the derived class. */
-  Vector unwhitenedError(const Values& x, boost::optional<std::vector<Matrix>&> H = boost::none) const override {
+  virtual Vector unwhitenedError(const Values& x, boost::optional<std::vector<Matrix>&> H = boost::none) const {
     if(this->active(x)) {
       if(H)
         return evaluateError(x.at<X1>(keys_[0]), x.at<X2>(keys_[1]), x.at<X3>(keys_[2]), x.at<X4>(keys_[3]), x.at<X5>(keys_[4]), (*H)[0], (*H)[1], (*H)[2], (*H)[3], (*H)[4]);
@@ -719,7 +719,7 @@ public:
 
   /** Calls the 6-key specific version of evaluateError, which is pure virtual
    * so must be implemented in the derived class. */
-  Vector unwhitenedError(const Values& x, boost::optional<std::vector<Matrix>&> H = boost::none) const override {
+  virtual Vector unwhitenedError(const Values& x, boost::optional<std::vector<Matrix>&> H = boost::none) const {
     if(this->active(x)) {
       if(H)
         return evaluateError(x.at<X1>(keys_[0]), x.at<X2>(keys_[1]), x.at<X3>(keys_[2]), x.at<X4>(keys_[3]), x.at<X5>(keys_[4]), x.at<X6>(keys_[5]), (*H)[0], (*H)[1], (*H)[2], (*H)[3], (*H)[4], (*H)[5]);

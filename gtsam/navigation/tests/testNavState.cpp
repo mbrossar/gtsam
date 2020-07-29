@@ -39,7 +39,8 @@ TEST(NavState, Constructor) {
   boost::function<NavState(const Rot3&, const Point3&, const Vector3&)> create =
       boost::bind(&NavState::Create, _1, _2, _3, boost::none, boost::none,
           boost::none);
-  Matrix aH1, aH2, aH3;
+  Matrix93 aH1, aH2, aH3;
+  
   EXPECT(
       assert_equal(kState1,
           NavState::Create(kAttitude, kPosition, kVelocity, aH1, aH2, aH3)));
@@ -51,7 +52,7 @@ TEST(NavState, Constructor) {
           numericalDerivative32(create, kAttitude, kPosition, kVelocity), aH2));
   EXPECT(
       assert_equal(
-          numericalDerivative32(create, kAttitude, kPosition, kVelocity), aH2));
+          numericalDerivative33(create, kAttitude, kPosition, kVelocity), aH3));
 }
 
 /* ************************************************************************* */
@@ -121,6 +122,13 @@ TEST( NavState, Manifold ) {
   Rot3 drot = Rot3::Expmap(xi.head<3>());
   Point3 dt = Point3(xi.segment<3>(3));
   Velocity3 dvel = Velocity3(-0.1, -0.2, -0.3);
+  
+  ExtendedPose3 T = ExtendedPose3::Expmap(xi);
+  dt = T.velocity();
+  Point3 pvel = T.position();
+  dvel.x() = pvel.x();
+  dvel.y() = pvel.y();
+  dvel.z() = pvel.z();
   NavState state2 = NavState(kState1.attitude() * drot,
       kState1.position() + kState1.attitude() * dt,
       kState1.velocity() + kState1.attitude() * dvel);
@@ -140,6 +148,7 @@ TEST( NavState, Manifold ) {
   EXPECT(assert_equal(numericalDerivative22(retract, kState1, xi), aH2));
 
   // Check retract derivatives on state 2
+  xi << 0.1, 0.1, 0.1, 0.2, 0.3, 0.4, -0.1, -0.2, -0.3;
   const Vector9 xi2 = -3.0*xi;
   state2.retract(xi2, aH1, aH2);
   EXPECT(assert_equal(numericalDerivative21(retract, state2, xi2), aH1));
@@ -236,18 +245,6 @@ TEST(NavState, CorrectPIM) {
   EXPECT(assert_equal(numericalDerivative21(correctPIM, kState1, xi), aH1));
   EXPECT(assert_equal(numericalDerivative22(correctPIM, kState1, xi), aH2));
 }
-
-/* ************************************************************************* */
-TEST(NavState, Stream)
-{
-  NavState state;
-
-  std::ostringstream os;
-  os << state;
-  string expected = "R: [\n\t1, 0, 0;\n\t0, 1, 0;\n\t0, 0, 1\n]\np: [0, 0, 0]'\nv: [0, 0, 0]'";
-  EXPECT(os.str() == expected);
-}
-
 
 /* ************************************************************************* */
 int main() {

@@ -139,14 +139,14 @@ namespace simulated2D {
     }
 
     /// Return error and optional derivative
-    Vector evaluateError(const Pose& x, boost::optional<Matrix&> H = boost::none) const override {
+    Vector evaluateError(const Pose& x, boost::optional<Matrix&> H = boost::none) const {
       return (prior(x, H) - measured_);
     }
 
     virtual ~GenericPrior() {}
 
     /// @return a deep copy of this factor
-    gtsam::NonlinearFactor::shared_ptr clone() const override {
+    virtual gtsam::NonlinearFactor::shared_ptr clone() const {
       return boost::static_pointer_cast<gtsam::NonlinearFactor>(
           gtsam::NonlinearFactor::shared_ptr(new This(*this))); }
 
@@ -185,14 +185,14 @@ namespace simulated2D {
     /// Evaluate error and optionally return derivatives
     Vector evaluateError(const Pose& x1, const Pose& x2,
         boost::optional<Matrix&> H1 = boost::none,
-        boost::optional<Matrix&> H2 = boost::none) const override {
+        boost::optional<Matrix&> H2 = boost::none) const {
       return (odo(x1, x2, H1, H2) - measured_);
     }
 
     virtual ~GenericOdometry() {}
 
     /// @return a deep copy of this factor
-    gtsam::NonlinearFactor::shared_ptr clone() const override {
+    virtual gtsam::NonlinearFactor::shared_ptr clone() const {
       return boost::static_pointer_cast<gtsam::NonlinearFactor>(
           gtsam::NonlinearFactor::shared_ptr(new This(*this))); }
 
@@ -232,14 +232,14 @@ namespace simulated2D {
     /// Evaluate error and optionally return derivatives
     Vector evaluateError(const Pose& x1, const Landmark& x2,
         boost::optional<Matrix&> H1 = boost::none,
-        boost::optional<Matrix&> H2 = boost::none) const override {
+        boost::optional<Matrix&> H2 = boost::none) const {
       return (mea(x1, x2, H1, H2) - measured_);
     }
 
     virtual ~GenericMeasurement() {}
 
     /// @return a deep copy of this factor
-    gtsam::NonlinearFactor::shared_ptr clone() const override {
+    virtual gtsam::NonlinearFactor::shared_ptr clone() const {
       return boost::static_pointer_cast<gtsam::NonlinearFactor>(
           gtsam::NonlinearFactor::shared_ptr(new This(*this))); }
 

@@ -22,14 +22,13 @@
 #include <gtsam/linear/NoiseModel.h>
 #include <gtsam/linear/VectorValues.h>
 
-#include <random>
+#include <boost/random.hpp>
 #include <vector>
 
 using namespace gtsam;
 using namespace std;
 
-static std::mt19937 rng;
-static std::uniform_real_distribution<> uniform(0.0, 1.0);
+static boost::variate_generator<boost::mt19937, boost::uniform_real<> > rg(boost::mt19937(), boost::uniform_real<>(0.0, 1.0));
 
 int main(int argc, char *argv[]) {
 
@@ -65,10 +64,10 @@ int main(int argc, char *argv[]) {
         Matrix A(blockdim, vardim);
         for(size_t j=0; j<blockdim; ++j)
           for(size_t k=0; k<vardim; ++k)
-            A(j,k) = uniform(rng);
+            A(j,k) = rg();
         Vector b(blockdim);
         for(size_t j=0; j<blockdim; ++j)
-          b(j) = uniform(rng);
+          b(j) = rg();
         blockGfgs[trial].push_back(boost::make_shared<JacobianFactor>(key, A, b, noise));
       }
     }
@@ -112,10 +111,10 @@ int main(int argc, char *argv[]) {
         // Generate a random Gaussian factor
         for(size_t j=0; j<blockdim; ++j)
           for(size_t k=0; k<vardim; ++k)
-            Acomb(blockdim*i+j, k) = uniform(rng);
+            Acomb(blockdim*i+j, k) = rg();
         Vector b(blockdim);
         for(size_t j=0; j<blockdim; ++j)
-          bcomb(blockdim*i+j) = uniform(rng);
+          bcomb(blockdim*i+j) = rg();
       }
       combGfgs[trial].push_back(boost::make_shared<JacobianFactor>(key, Acomb, bcomb,
           noiseModel::Isotropic::Sigma(blockdim*nBlocks, 1.0)));

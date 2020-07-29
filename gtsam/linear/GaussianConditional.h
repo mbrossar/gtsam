@@ -88,10 +88,10 @@ namespace gtsam {
 
     /** print */
     void print(const std::string& = "GaussianConditional",
-      const KeyFormatter& formatter = DefaultKeyFormatter) const override;
+      const KeyFormatter& formatter = DefaultKeyFormatter) const;
 
     /** equals function */
-    bool equals(const GaussianFactor&cg, double tol = 1e-9) const override;
+    bool equals(const GaussianFactor&cg, double tol = 1e-9) const;
 
     /** Return a view of the upper-triangular R block of the conditional */
     constABlock R() const { return Ab_.range(0, nrFrontals()); }

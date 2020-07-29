@@ -34,11 +34,11 @@ namespace gtsam {
     AllDiff(const DiscreteKeys& dkeys);
 
     // print
-    void print(const std::string& s = "",
-        const KeyFormatter& formatter = DefaultKeyFormatter) const override;
+    virtual void print(const std::string& s = "",
+        const KeyFormatter& formatter = DefaultKeyFormatter) const;
 
     /// equals
-    bool equals(const DiscreteFactor& other, double tol) const override {
+    bool equals(const DiscreteFactor& other, double tol) const {
       if(!dynamic_cast<const AllDiff*>(&other))
         return false;
       else {
@@ -50,13 +50,13 @@ namespace gtsam {
     }
 
     /// Calculate value = expensive !
-    double operator()(const Values& values) const override;
+    virtual double operator()(const Values& values) const;
 
     /// Convert into a decisiontree, can be *very* expensive !
-    DecisionTreeFactor toDecisionTreeFactor() const override;
+    virtual DecisionTreeFactor toDecisionTreeFactor() const;
 
     /// Multiply into a decisiontree
-    DecisionTreeFactor operator*(const DecisionTreeFactor& f) const override;
+    virtual DecisionTreeFactor operator*(const DecisionTreeFactor& f) const;
 
     /*
      * Ensure Arc-consistency
@@ -65,13 +65,13 @@ namespace gtsam {
      * @param j domain to be checked
      * @param domains all other domains
      */
-    bool ensureArcConsistency(size_t j, std::vector<Domain>& domains) const override;
+    bool ensureArcConsistency(size_t j, std::vector<Domain>& domains) const;
 
     /// Partially apply known values
-    Constraint::shared_ptr partiallyApply(const Values&) const override;
+    virtual Constraint::shared_ptr partiallyApply(const Values&) const;
 
     /// Partially apply known values, domain version
-    Constraint::shared_ptr partiallyApply(const std::vector<Domain>&) const override;
+    virtual Constraint::shared_ptr partiallyApply(const std::vector<Domain>&) const;
   };
 
 } // namespace gtsam

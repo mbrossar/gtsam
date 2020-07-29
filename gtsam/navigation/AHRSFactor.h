@@ -158,14 +158,14 @@ public:
   }
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override;
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const;
 
   /// print
-  void print(const std::string& s, const KeyFormatter& keyFormatter =
-      DefaultKeyFormatter) const override;
+  virtual void print(const std::string& s, const KeyFormatter& keyFormatter =
+      DefaultKeyFormatter) const;
 
   /// equals
-  bool equals(const NonlinearFactor&, double tol = 1e-9) const override;
+  virtual bool equals(const NonlinearFactor&, double tol = 1e-9) const;
 
   /// Access the preintegrated measurements.
   const PreintegratedAhrsMeasurements& preintegratedMeasurements() const {
@@ -178,7 +178,7 @@ public:
   Vector evaluateError(const Rot3& rot_i, const Rot3& rot_j,
       const Vector3& bias, boost::optional<Matrix&> H1 = boost::none,
       boost::optional<Matrix&> H2 = boost::none, boost::optional<Matrix&> H3 =
-          boost::none) const override;
+          boost::none) const;
 
   /// predicted states from IMU
   /// TODO(frank): relationship with PIM predict ??

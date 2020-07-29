@@ -73,14 +73,14 @@ class SmartRangeFactor: public NoiseModelFactor {
   // Testable
 
   /** print */
-  void print(const std::string& s = "",
-      const KeyFormatter& keyFormatter = DefaultKeyFormatter) const override {
+  virtual void print(const std::string& s = "",
+      const KeyFormatter& keyFormatter = DefaultKeyFormatter) const {
     std::cout << s << "SmartRangeFactor with " << size() << " measurements\n";
     NoiseModelFactor::print(s);
   }
 
   /** Check if two factors are equal */
-  bool equals(const NonlinearFactor& f, double tol = 1e-9) const override {
+  virtual bool equals(const NonlinearFactor& f, double tol = 1e-9) const {
     return false;
   }
 
@@ -143,8 +143,8 @@ class SmartRangeFactor: public NoiseModelFactor {
   /**
    * Error function *without* the NoiseModel, \f$ z-h(x) \f$.
    */
-  Vector unwhitenedError(const Values& x,
-      boost::optional<std::vector<Matrix>&> H = boost::none) const override {
+  virtual Vector unwhitenedError(const Values& x,
+      boost::optional<std::vector<Matrix>&> H = boost::none) const {
     size_t n = size();
     if (n < 3) {
       if (H) {
@@ -175,7 +175,7 @@ class SmartRangeFactor: public NoiseModelFactor {
   }
 
   /// @return a deep copy of this factor
-  gtsam::NonlinearFactor::shared_ptr clone() const override {
+  virtual gtsam::NonlinearFactor::shared_ptr clone() const {
     return boost::static_pointer_cast<gtsam::NonlinearFactor>(
         gtsam::NonlinearFactor::shared_ptr(new This(*this)));
   }
